@@ -33,4 +33,22 @@ router.post("/login", (req, res) => {
   });
 });
 
+// Register
+router.post("/register", (req, res) => {
+  let details = {
+    user: req.body.user,
+    email: req.body.email,
+    password: req.body.password,
+
+  };
+  let sql = "INSERT INTO user SET ?";
+  conn.query(sql, details, (error) => {
+    if (error) {
+      res.send({ status: false, message: "Register created Failed" });
+    } else {
+      res.send({ status: true, message: "Register created successfully" });
+    }
+  });
+});
+
 module.exports = router;
