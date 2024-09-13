@@ -10,13 +10,7 @@ const db = mysql.createConnection({
   db.connect((err) => {
     if (err) throw err;
     console.log("Connected to the database.");
-    // db.query('SELECT * FROM user', (err, results) => {
-    //     if (err) {
-    //         console.error('Error executing query:', err);
-    //     } else {
-    //         console.log(results); // แสดงข้อมูลที่ได้จากฐานข้อมูล
-    //     }
-    // });
+   
 });
 
 module.exports = db;

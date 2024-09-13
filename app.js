@@ -1,6 +1,7 @@
 const express = require('express');
 const user = require('./api/users');
 const admin = require('./api/admin');
+const product = require('./api/product');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -13,5 +14,6 @@ app.use(bodyParser.json());
 
 app.use("/users", user);
 app.use("/admin", admin);
+app.use("/product", product);
 
 module.exports = app;

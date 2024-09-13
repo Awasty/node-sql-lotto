@@ -18,37 +18,51 @@ router.get("/", (req, res) => {
 
 //Login
 router.post("/login", (req, res) => {
-  let details = {
-      email: req.body.email,
-      password: req.body.password,
-  };
+  // let details = {
+  //   email: req.body.email,
+  //   password: req.body.password,
+  // };
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ error: "Email and password are required" });
+    return;
+  }
   const sql = "SELECT * FROM user WHERE email = ? AND password = ?";
 
-  conn.query(sql, [details.email, details.password], (error, result) => {
-      if (error) {
-          res.status(400).json({ status: false, message: "Login created Failed", error: error });
-      } else {
-          res.json(result);
-      }
+  db.query(sql, [email, password], (error, result) => {
+    if (error) {
+      console.error("Database query error:", error);
+      return res
+        .status(500)
+        .json({ status: false, message: "Internal server error" });
+    }
+    if (result.length === 0) {
+      return res
+        .status(401)
+        .json({ status: false, message: "Invalid credentials" });
+    }
+    res.json({ status: true, message: "Login successful", user: result[0] });
   });
 });
 
-// Register
 router.post("/register", (req, res) => {
   let details = {
-    user: req.body.user,
+    name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-
   };
   let sql = "INSERT INTO user SET ?";
-  conn.query(sql, details, (error) => {
+  db.query(sql, details, (error) => {
     if (error) {
+      console.error("Database error:", error); // Log the error
       res.send({ status: false, message: "Register created Failed" });
     } else {
       res.send({ status: true, message: "Register created successfully" });
     }
   });
 });
+
 
 module.exports = router;
