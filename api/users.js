@@ -77,6 +77,35 @@ router.post("/deposit", (req, res) => {
   });
 });
 
+router.post("/register", (req, res) => {
+  const { name, email, password } = req.body;
+
+  // ตรวจสอบว่า email มีอยู่ใน database หรือไม่
+  let checkEmailSql = "SELECT * FROM user WHERE email = ?";
+  db.query(checkEmailSql, [email], (error, result) => {
+    if (error) {
+      console.error("Database error:", error);
+      return res.status(500).send({ status: false, message: "Database error" });
+    }
+
+    if (result.length > 0) {
+      // ถ้าอีเมลมีอยู่แล้วใน database
+      return res.status(409).send({ status: false, message: "Email already exists" });
+    }
+
+    // ถ้าอีเมลไม่ซ้ำ ทำการ INSERT ลงใน database
+    let details = { name, email, password };
+    let insertSql = "INSERT INTO user SET ?";
+    db.query(insertSql, details, (error) => {
+      if (error) {
+        console.error("Database insert error:", error); // Log the error
+        return res.status(500).send({ status: false, message: "Register created failed" });
+      }
+      res.status(201).send({ status: true, message: "Register created successfully" });
+    });
+  });
+});
+
 
 
 

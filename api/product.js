@@ -17,3 +17,22 @@ router.get("/", (req, res) => {
 });
 
 module.exports = router;
+
+
+
+// router.post("/register", (req, res) => {
+//   let details = {
+//     name: req.body.name,
+//     email: req.body.email,
+//     password: req.body.password,
+//   };
+//   let sql = "INSERT INTO user SET ?";
+//   db.query(sql, details, (error) => {
+//     if (error) {
+//       console.error("Database error:", error); // Log the error
+//       res.send({ status: false, message: "Register created Failed" });
+//     } else {
+//       res.send({ status: true, message: "Register created successfully" });
+//     }
+//   });
+// });
