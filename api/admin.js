@@ -59,5 +59,57 @@ router.delete("/delete", (req, res) => {
     });
 });
 
+router.get("/random", (req, res) => {
+    // ดึงข้อมูล id และ number ทั้งหมดจากตาราง product
+    const sql = "SELECT id, number FROM product"; // คำสั่ง SQL เพื่อดึง id และ number
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Error executing query:", err);
+            return res.status(500).send("Error fetching data from product table");
+        }
+
+        // ตรวจสอบว่ามีข้อมูลในฐานข้อมูลหรือไม่
+        if (results.length === 0) {
+            return res.status(404).send("No products found");
+        }
+
+        // สุ่ม 5 ผลลัพธ์จากข้อมูล
+        const shuffled = results.sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับ
+        const selectedProducts = shuffled.slice(0, 5); // เลือก 5 ผลลัพธ์แรกหลังจากสุ่ม
+
+        res.json(selectedProducts); // ส่งผลลัพธ์กลับไปในรูปแบบ JSON
+    });
+});
+
+router.post("/rank", (req, res) => {
+    const rewards = req.body.rewards;
+  
+    // แปลง id ที่เป็น string ให้เป็น int
+    const rewardIds = rewards.map(reward => parseInt(reward.id, 10)); // แปลง id เป็น int
+    console.log(rewardIds)
+    if (!rewardIds || rewardIds.length !== 5) {
+      return res.status(400).send("Invalid request. 5 rewards are required.");
+    }
+  
+    const sql = `UPDATE product SET status = CASE id
+      WHEN ? THEN 1
+      WHEN ? THEN 2
+      WHEN ? THEN 3
+      WHEN ? THEN 4
+      WHEN ? THEN 5
+      END
+      WHERE id IN (?, ?, ?, ?, ?)`;
+  
+    db.query(sql, [...rewardIds, ...rewardIds], (err, result) => {
+      if (err) {
+        console.error("Error executing query:", err);
+        return res.status(500).send("Error updating product status.");
+      }
+  
+      res.send("Product status updated successfully.");
+    });
+  });
+  
+  
 
 module.exports = router;
