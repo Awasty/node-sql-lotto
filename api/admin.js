@@ -38,18 +38,6 @@ router.get("/add", (req, res) => {
     });
 });
 
-// router.delete("/delete", (req, res) => {
-//     const sql = "DELETE FROM product"; // SQL query to delete all records
-
-//     db.query(sql, (err, result) => {
-//         if (err) {
-//             console.error("Error executing query:", err);
-//             return res.status(500).send("Error deleting data from product table");
-//         }
-//         res.status(200).send(`Successfully deleted ${result.affectedRows} rows from product table`);
-//     });
-// });
-
 router.delete("/delete", (req, res) => {
     const sql = "DELETE FROM product"; // SQL query to delete all records
 

@@ -18,11 +18,6 @@ router.get("/", (req, res) => {
 
 //Login
 router.post("/login", (req, res) => {
-  // let details = {
-  //   email: req.body.email,
-  //   password: req.body.password,
-  // };
-
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -47,22 +42,43 @@ router.post("/login", (req, res) => {
   });
 });
 
-router.post("/register", (req, res) => {
-  let details = {
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  };
-  let sql = "INSERT INTO user SET ?";
-  db.query(sql, details, (error) => {
+router.post("/deposit", (req, res) => {
+  const userId = req.body.uid; // รับค่า user id จาก request
+  const depositAmount = req.body.amount; // รับจำนวนเงินที่จะเพิ่ม
+
+  // SQL สำหรับการอัปเดตฟิลด์ money ของ user ที่มี userId ตามที่ระบุ
+  let updateSql = "UPDATE user SET money = money + ? WHERE id = ?";
+  db.query(updateSql, [depositAmount, userId], (error, results) => {
     if (error) {
       console.error("Database error:", error); // Log the error
-      res.send({ status: false, message: "Register created Failed" });
+      res.send({ status: false, message: "Deposit failed" });
+    } else if (results.affectedRows === 0) {
+      // ถ้าไม่มีการอัปเดต (ไม่มี user ที่ตรงกับ id)
+      res.send({ status: false, message: "User not found" });
     } else {
-      res.send({ status: true, message: "Register created successfully" });
+      // หลังจากการอัปเดตสำเร็จ ให้ทำการ SELECT เพื่อนำค่า money กลับมา
+      let selectSql = "SELECT money FROM user WHERE id = ?";
+      db.query(selectSql, [userId], (error, results) => {
+        if (error) {
+          console.error("Database error during SELECT:", error); // Log the error
+          res.send({ status: false, message: "Error retrieving money" });
+        } else if (results.length === 0) {
+          res.send({ status: false, message: "User not found after deposit" });
+        } else {
+          const remainingMoney = results[0].money; // ดึงค่าจำนวนเงินที่เหลือ
+          res.send({ 
+            status: true, 
+            message: "Deposit successful", 
+            remainingMoney: remainingMoney // ส่งค่าจำนวนเงินกลับไปด้วย
+          });
+        }
+      });
     }
   });
 });
+
+
+
 
 
 module.exports = router;
